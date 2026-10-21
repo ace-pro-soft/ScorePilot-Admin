@@ -8,7 +8,8 @@ import {
 import DeleteIcon from '@mui/icons-material/DeleteOutline'
 import EditIcon from '@mui/icons-material/EditOutlined'
 import ForumIcon from '@mui/icons-material/ForumOutlined'
-import { api, get, patch, post } from '../api'
+import AdminIcon from '@mui/icons-material/AdminPanelSettingsOutlined'
+import { api, get, patch, post, put } from '../api'
 import { useAuth } from '../auth'
 import { EmptyRow, ErrorBox, Kpi, Loading, PageHeader, ago, useAction, useLoad, when } from '../components/common'
 
@@ -207,11 +208,62 @@ function MessagesDialog({ community, writable, onClose }: { community: Community
   )
 }
 
+type CommunityAdmin = { user: ModUser; role: string; since: string }
+
+/** Who moderates a community in the app: owners and admins can pin and delete messages there. */
+function AdminsDialog({ community, writable, onClose }: { community: Community; writable: boolean; onClose: () => void }) {
+  const { data, error, loading, reload } = useLoad(() => get<{ items: CommunityAdmin[] }>(`/community/conversations/${community.id}/admins`), [community.id])
+  const { run, busy } = useAction()
+  const [email, setEmail] = useState('')
+  const set = (body: { email?: string; user_id?: number; admin: boolean }, msg: string) =>
+    run(() => put(`/community/conversations/${community.id}/admins`, body), msg).then((ok) => { if (ok) { setEmail(''); reload() } })
+  return (
+    <Dialog open onClose={onClose} fullWidth maxWidth="sm">
+      <DialogTitle>{community.title} · admins</DialogTitle>
+      <DialogContent dividers>
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+          Admins show an “Admin” label in the chat and can pin and delete messages in this community.
+        </Typography>
+        {error && <ErrorBox error={error} onRetry={reload} />}
+        {loading && !data ? <Loading /> : (
+          <Table size="small">
+            <TableBody>
+              {(data?.items ?? []).length === 0 && <EmptyRow cols={3} text="No admins yet." />}
+              {(data?.items ?? []).map((a) => (
+                <TableRow key={a.user.id}>
+                  <TableCell><Sender u={a.user} /></TableCell>
+                  <TableCell><Chip size="small" label={a.role} color={a.role === 'owner' ? 'primary' : 'default'} /></TableCell>
+                  <TableCell align="right">
+                    {writable && a.role === 'admin' && (
+                      <Button size="small" color="error" disabled={busy} onClick={() => set({ user_id: a.user.id, admin: false }, 'Admin removed')}>Remove</Button>
+                    )}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        )}
+        {writable && (
+          <Stack direction="row" spacing={1} sx={{ mt: 2 }}>
+            <TextField size="small" label="Email of the person to appoint" value={email} onChange={(e) => setEmail(e.target.value)} fullWidth
+              helperText="They need a community profile. They join the community if they haven't." />
+            <Button variant="contained" disabled={busy || !email.includes('@')} onClick={() => set({ email: email.trim(), admin: true }, 'Admin appointed')} sx={{ alignSelf: 'flex-start', height: 40 }}>
+              Appoint
+            </Button>
+          </Stack>
+        )}
+      </DialogContent>
+      <DialogActions><Button onClick={onClose}>Close</Button></DialogActions>
+    </Dialog>
+  )
+}
+
 function Communities({ writable }: { writable: boolean }) {
   const { data, error, loading, reload } = useLoad(() => get<{ items: Community[] }>('/community/communities'))
   const { run, busy } = useAction()
   const [editing, setEditing] = useState<Community | 'new' | null>(null)
   const [viewing, setViewing] = useState<Community | null>(null)
+  const [admins, setAdmins] = useState<Community | null>(null)
   return (
     <>
       {writable && <Button variant="contained" sx={{ mb: 2 }} onClick={() => setEditing('new')}>New community</Button>}
@@ -243,6 +295,7 @@ function Communities({ writable }: { writable: boolean }) {
                     </TableCell>
                     <TableCell align="right" sx={{ whiteSpace: 'nowrap' }}>
                       <Tooltip title="Read messages"><IconButton size="small" onClick={() => setViewing(c)}><ForumIcon fontSize="small" /></IconButton></Tooltip>
+                      <Tooltip title="Admins"><IconButton size="small" onClick={() => setAdmins(c)}><AdminIcon fontSize="small" /></IconButton></Tooltip>
                       {writable && <Tooltip title="Edit"><IconButton size="small" onClick={() => setEditing(c)}><EditIcon fontSize="small" /></IconButton></Tooltip>}
                     </TableCell>
                   </TableRow>
@@ -254,6 +307,7 @@ function Communities({ writable }: { writable: boolean }) {
       )}
       {editing && <CommunityDialog open initial={editing === 'new' ? undefined : editing} onClose={() => setEditing(null)} onSaved={reload} />}
       {viewing && <MessagesDialog community={viewing} writable={writable} onClose={() => setViewing(null)} />}
+      {admins && <AdminsDialog community={admins} writable={writable} onClose={() => setAdmins(null)} />}
     </>
   )
 }
