@@ -17,6 +17,10 @@ type Detail = {
   invoices: { id: string; status: string; plan: { name: string }; amount: string; method: { asset: string; network: string }; amount_usd: string; created_at: string; tx_hash?: string; tx_url?: string }[]
   favourites: { kind: string; ref_id: string; name: string }[]
   audit: { id: number; action: string; admin_email: string; detail: string; created_at: string }[]
+  chat: {
+    profile_complete: boolean; name: string; username: string; bio: string; phone: string; phone_verified: boolean
+    chat_banned: boolean; last_seen_at?: string; messages: number; reports_against: number; conversations: number
+  }
 }
 
 export default function UserDetail() {
@@ -29,6 +33,7 @@ export default function UserDetail() {
   const [source, setSource] = useState('comp')
   const [revoke, setRevoke] = useState<Entitlement | null>(null)
   const [disableOpen, setDisableOpen] = useState(false)
+  const [banOpen, setBanOpen] = useState(false)
 
   if (loading && !data) return <Loading />
   if (error) return <ErrorBox error={error} onRetry={reload} />
@@ -85,6 +90,34 @@ export default function UserDetail() {
           </Card>
         </Grid>
       </Grid>
+
+      <Card sx={{ mb: 3 }}>
+        <CardContent>
+          <Stack direction={{ xs: 'column', sm: 'row' }} justifyContent="space-between" spacing={2}>
+            <Box>
+              <Typography variant="body2" color="text.secondary">Community</Typography>
+              {d.chat.profile_complete ? (
+                <>
+                  <Typography sx={{ mt: 0.5 }}><b>{d.chat.name}</b>{d.chat.username && ` · @${d.chat.username}`}</Typography>
+                  {d.chat.bio && <Typography variant="body2" color="text.secondary">{d.chat.bio}</Typography>}
+                </>
+              ) : <Typography sx={{ mt: 0.5 }} color="text.secondary">No community profile yet.</Typography>}
+              <Typography variant="body2" sx={{ mt: 1 }}>
+                {d.chat.messages} messages · {d.chat.conversations} chats · {d.chat.reports_against} reports against · last seen {when(d.chat.last_seen_at)}
+                {d.chat.phone && ` · ${d.chat.phone}${d.chat.phone_verified ? ' (verified)' : ''}`}
+              </Typography>
+              {d.chat.chat_banned && <Chip size="small" color="error" label="banned from posting" sx={{ mt: 1 }} />}
+            </Box>
+            {can('community.write') && (
+              <Box>
+                <Button variant="outlined" color={d.chat.chat_banned ? 'primary' : 'error'} onClick={() => setBanOpen(true)}>
+                  {d.chat.chat_banned ? 'Allow posting again' : 'Ban from posting'}
+                </Button>
+              </Box>
+            )}
+          </Stack>
+        </CardContent>
+      </Card>
 
       <Typography variant="h6" sx={{ mb: 1 }}>Premium periods</Typography>
       <Paper sx={{ mb: 3 }}>
@@ -190,6 +223,15 @@ export default function UserDetail() {
           if (ok) reload()
           return ok
         }}
+      />
+      <NoteDialog
+        open={banOpen}
+        title={d.chat.chat_banned ? 'Allow posting again?' : 'Ban from posting?'}
+        text={d.chat.chat_banned ? 'They can send messages, react and create groups again.' : 'They can still sign in and read chats, but can no longer send messages, react or create groups.'}
+        confirm={d.chat.chat_banned ? 'Allow posting' : 'Ban'}
+        danger={!d.chat.chat_banned}
+        onClose={() => setBanOpen(false)}
+        onConfirm={(note) => run(() => post(`/users/${d.user.id}/chat-ban`, { banned: !d.chat.chat_banned, note }), d.chat.chat_banned ? 'Posting allowed' : 'User banned from posting').then((ok) => { if (ok) reload(); return ok })}
       />
     </>
   )

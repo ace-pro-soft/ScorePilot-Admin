@@ -16,6 +16,7 @@ import TuneIcon from '@mui/icons-material/TuneOutlined'
 import SyncIcon from '@mui/icons-material/SyncOutlined'
 import AdminIcon from '@mui/icons-material/AdminPanelSettingsOutlined'
 import HistoryIcon from '@mui/icons-material/HistoryOutlined'
+import ForumIcon from '@mui/icons-material/ForumOutlined'
 import MenuIcon from '@mui/icons-material/Menu'
 import { useAuth } from '../auth'
 import { brand } from '../theme'
@@ -31,6 +32,7 @@ const sections: { title: string; items: NavItem[] }[] = [
       { to: '/users', label: 'Users', icon: <PeopleIcon /> },
       { to: '/payments', label: 'Payments', icon: <ReceiptIcon /> },
       { to: '/transfers', label: 'Transfers', icon: <SwapIcon /> },
+      { to: '/community', label: 'Community', icon: <ForumIcon /> },
     ],
   },
   {

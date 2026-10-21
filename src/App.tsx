@@ -8,6 +8,7 @@ import Users from './pages/Users'
 import UserDetail from './pages/UserDetail'
 import Payments from './pages/Payments'
 import Transfers from './pages/Transfers'
+import Community from './pages/Community'
 import Catalogue from './pages/Catalogue'
 import Picks from './pages/Picks'
 import Leagues from './pages/Leagues'
@@ -29,6 +30,7 @@ export default function App() {
         <Route path="/users/:id" element={<UserDetail />} />
         <Route path="/payments" element={<Payments />} />
         <Route path="/transfers" element={<Transfers />} />
+        <Route path="/community" element={<Community />} />
         <Route path="/catalogue" element={<Catalogue />} />
         <Route path="/picks" element={<Picks />} />
         <Route path="/leagues" element={<Leagues />} />
