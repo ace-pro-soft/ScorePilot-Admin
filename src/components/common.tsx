@@ -134,6 +134,7 @@ export const usd = (cents?: number) => (cents == null ? '–' : `$${(cents / 100
 const statusTone: Record<string, 'success' | 'warning' | 'error' | 'default' | 'info'> = {
   paid: 'success', credited: 'success', pending: 'info', confirming: 'warning', review: 'warning', matched: 'warning',
   unmatched: 'warning', expired: 'default', cancelled: 'default', ignored: 'default', rejected: 'error',
+  published: 'success', draft: 'info', withdrawn: 'default',
 }
 
 export function StatusChip({ status }: { status?: string }) {

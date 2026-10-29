@@ -13,6 +13,7 @@ import SellIcon from '@mui/icons-material/SellOutlined'
 import TrophyIcon from '@mui/icons-material/EmojiEventsOutlined'
 import StarIcon from '@mui/icons-material/StarOutline'
 import TuneIcon from '@mui/icons-material/TuneOutlined'
+import SystemUpdateIcon from '@mui/icons-material/SystemUpdateOutlined'
 import SyncIcon from '@mui/icons-material/SyncOutlined'
 import AdminIcon from '@mui/icons-material/AdminPanelSettingsOutlined'
 import HistoryIcon from '@mui/icons-material/HistoryOutlined'
@@ -42,6 +43,7 @@ const sections: { title: string; items: NavItem[] }[] = [
       { to: '/picks', label: 'Picks', icon: <StarIcon /> },
       { to: '/leagues', label: 'Leagues', icon: <TrophyIcon /> },
       { to: '/settings', label: 'App settings', icon: <TuneIcon /> },
+      { to: '/releases', label: 'App releases', icon: <SystemUpdateIcon /> },
     ],
   },
   {

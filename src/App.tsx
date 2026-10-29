@@ -13,6 +13,7 @@ import Catalogue from './pages/Catalogue'
 import Picks from './pages/Picks'
 import Leagues from './pages/Leagues'
 import Settings from './pages/Settings'
+import Releases from './pages/Releases'
 import Operations from './pages/Operations'
 import Admins from './pages/Admins'
 import Audit from './pages/Audit'
@@ -35,6 +36,7 @@ export default function App() {
         <Route path="/picks" element={<Picks />} />
         <Route path="/leagues" element={<Leagues />} />
         <Route path="/settings" element={<Settings />} />
+        <Route path="/releases" element={<Releases />} />
         <Route path="/operations" element={<Operations />} />
         <Route path="/admins" element={<Admins />} />
         <Route path="/audit" element={<Audit />} />
