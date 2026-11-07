@@ -9,6 +9,7 @@ import { EmptyRow, ErrorBox, Loading, Mono, PageHeader, StatusChip, short, useAc
 
 type Release = {
   id: number
+  platform: string
   version_code: number
   version_name: string
   file: string
@@ -28,7 +29,16 @@ type ReleasesResponse = { releases: Release[]; package: string; cert_pinned: boo
 
 const mb = (bytes: number) => `${(bytes / (1024 * 1024)).toFixed(1)} MB`
 
-/** APKs the Android app updates itself from (docs/app-updates.md in the backend). */
+const platformNames: Record<string, string> = {
+  android: 'Android',
+  'win-x64': 'Windows',
+  'linux-x64': 'Linux',
+  'osx-arm64': 'macOS (Apple silicon)',
+  'osx-x64': 'macOS (Intel)',
+}
+const platformName = (platform: string) => platformNames[platform] ?? platform
+
+/** The files the Android and desktop apps update themselves from (docs/app-updates.md in the backend). */
 export default function Releases() {
   const { can } = useAuth()
   const writable = can('ops.write')
@@ -38,7 +48,10 @@ export default function Releases() {
   const [editing, setEditing] = useState<Release | null>(null)
   if (loading && !data) return error ? <ErrorBox error={error} onRetry={reload} /> : <Loading />
   const releases = data?.releases ?? []
-  const live = releases.find((r) => r.status === 'published')
+  // The list is sorted by platform, newest first, so the first published one of each is what's offered.
+  const live = releases.filter((r, i) => r.status === 'published'
+    && !releases.slice(0, i).some((earlier) => earlier.status === 'published' && earlier.platform === r.platform))
+  const latestApk = releases.find((r) => r.platform === 'android')
 
   const act = (r: Release, action: 'publish' | 'withdraw', ok: string) =>
     run(() => post(`/releases/${r.id}/${action}`), ok).then((done) => { if (done) reload() })
@@ -49,19 +62,20 @@ export default function Releases() {
     <>
       <PageHeader
         title="App releases"
-        subtitle={`APKs the Android app (${data?.package ?? 'com.football.scorepilot'}) updates itself from. ${live ? `Offered now: ${live.version_name} (${live.version_code}).` : 'Nothing is offered yet.'}`}
-        actions={writable && <Button variant="contained" onClick={() => setUploadOpen(true)}>Upload APK</Button>}
+        subtitle={`The files the Android app (${data?.package ?? 'com.football.scorepilot'}) and the desktop app update themselves from. ${live.length > 0 ? `Offered now: ${live.map((r) => `${platformName(r.platform)} ${r.version_name}`).join(', ')}.` : 'Nothing is offered yet.'}`}
+        actions={writable && <Button variant="contained" onClick={() => setUploadOpen(true)}>Upload</Button>}
       />
-      {!data?.cert_pinned && releases.length > 0 && (
+      {!data?.cert_pinned && latestApk && (
         <Alert severity="info" sx={{ mb: 2 }}>
-          Uploads must be signed with the key of the latest release. To pin the key on the server, set
-          {' '}<Mono>RELEASE_CERT_SHA256={releases[0].cert_sha256}</Mono>
+          APK uploads must be signed with the key of the latest release. To pin the key on the server, set
+          {' '}<Mono>RELEASE_CERT_SHA256={latestApk.cert_sha256}</Mono>
         </Alert>
       )}
       <TableContainer component={Paper}>
         <Table size="small">
           <TableHead>
             <TableRow>
+              <TableCell>Platform</TableCell>
               <TableCell>Version</TableCell>
               <TableCell>Status</TableCell>
               <TableCell>What's new</TableCell>
@@ -74,9 +88,10 @@ export default function Releases() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {releases.length === 0 && <EmptyRow cols={writable ? 9 : 8} text="No releases yet. Upload a signed APK to start." />}
+            {releases.length === 0 && <EmptyRow cols={writable ? 10 : 9} text="No releases yet. Upload a signed APK or a desktop installer to start." />}
             {releases.map((r) => (
               <TableRow key={r.id} hover>
+                <TableCell sx={{ whiteSpace: 'nowrap' }}>{platformName(r.platform)}</TableCell>
                 <TableCell>
                   <Typography fontWeight={600}>{r.version_name}</Typography>
                   <Typography variant="caption" color="text.secondary">code {r.version_code}</Typography>
@@ -103,11 +118,11 @@ export default function Releases() {
                     <Button size="small" onClick={() => setEditing(r)}>Edit</Button>
                     {r.status !== 'published' && (
                       <Button size="small" variant="contained" disabled={busy}
-                        onClick={() => act(r, 'publish', `${r.version_name} is now offered to the app`)}>Publish</Button>
+                        onClick={() => act(r, 'publish', `${platformName(r.platform)} ${r.version_name} is now offered to the app`)}>Publish</Button>
                     )}
                     {r.status === 'published' && (
                       <Button size="small" color="warning" disabled={busy}
-                        onClick={() => act(r, 'withdraw', `${r.version_name} withdrawn`)}>Withdraw</Button>
+                        onClick={() => act(r, 'withdraw', `${platformName(r.platform)} ${r.version_name} withdrawn`)}>Withdraw</Button>
                     )}
                     {r.status !== 'published' && (
                       <Button size="small" color="error" disabled={busy} onClick={() => remove(r)}>Delete</Button>
@@ -121,7 +136,8 @@ export default function Releases() {
       </TableContainer>
       <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
         A required release keeps the update bar on screen in the app until the user updates; the app is never blocked.
-        Withdrawing stops offering a release; phones that installed it keep it.
+        Withdrawing stops offering a release; devices that installed it keep it. Desktop installers aren't code-signed
+        yet, so Windows and macOS warn people who download them by hand; updates from inside the app don't show that warning.
       </Typography>
       <UploadDialog open={uploadOpen} onClose={() => setUploadOpen(false)} onDone={reload} />
       <EditDialog release={editing} onClose={() => setEditing(null)} onDone={reload} />
@@ -130,7 +146,7 @@ export default function Releases() {
 }
 
 /** Uploads with XMLHttpRequest, which (unlike fetch) reports upload progress. */
-function uploadApk(form: FormData, onProgress: (pct: number) => void): Promise<{ release: Release }> {
+function uploadRelease(form: FormData, onProgress: (pct: number) => void): Promise<{ release: Release }> {
   return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest()
     xhr.open('POST', '/admin/api/releases')
@@ -166,22 +182,24 @@ function UploadDialog({ open, onClose, onDone }: { open: boolean; onClose: () =>
     form.append('notes', notes)
     form.append('required', String(required))
     setProgress(0)
-    const ok = await run(() => uploadApk(form, setProgress), 'APK uploaded as a draft. Publish it to offer it to the app.')
+    const ok = await run(() => uploadRelease(form, setProgress), 'Uploaded as a draft. Publish it to offer it to the app.')
     setProgress(null)
     if (ok) { onDone(); setFile(null); setNotes(''); setRequired(false); onClose() }
   }
   return (
     <Dialog open={open} onClose={close} fullWidth maxWidth="sm">
-      <DialogTitle>Upload APK</DialogTitle>
+      <DialogTitle>Upload a release</DialogTitle>
       <DialogContent>
         <Typography color="text.secondary" sx={{ mb: 2 }}>
-          A signed release APK with a higher version code than every earlier release. The server reads the version from the file.
+          A signed release APK, or a desktop installer exactly as the build names it (for example
+          {' '}<Mono>ScorePilot-1.2.3-win-x64-setup.exe</Mono>). The version must be higher than every earlier release for
+          that platform. The server reads the platform and version from the file.
         </Typography>
         <Stack spacing={2}>
           <Box>
             <Button variant="outlined" component="label" disabled={progress !== null}>
-              Choose APK
-              <input hidden type="file" accept=".apk,application/vnd.android.package-archive"
+              Choose file
+              <input hidden type="file" accept=".apk,.exe,.AppImage,.dmg,application/vnd.android.package-archive"
                 onChange={(e) => setFile(e.target.files?.[0] ?? null)} />
             </Button>
             <Typography variant="body2" sx={{ mt: 1 }}>{file ? `${file.name} · ${mb(file.size)}` : 'No file chosen'}</Typography>
@@ -193,7 +211,7 @@ function UploadDialog({ open, onClose, onDone }: { open: boolean; onClose: () =>
           {progress !== null && (
             <Box>
               <LinearProgress variant="determinate" value={progress} />
-              <Typography variant="caption" color="text.secondary">{progress < 100 ? `Uploading ${progress}%` : 'Checking the APK…'}</Typography>
+              <Typography variant="caption" color="text.secondary">{progress < 100 ? `Uploading ${progress}%` : 'Checking the file…'}</Typography>
             </Box>
           )}
         </Stack>
