@@ -11,7 +11,7 @@ import { ago, EmptyRow, ErrorBox, Loading, Mono, NoteDialog, PageHeader, StatusC
 type Entitlement = { id: number; plan_id: string; source: string; starts_at: string; expires_at: string; revoked_at?: string; note?: string }
 type Device = {
   ID: number; DeviceID: string; Platform: string; AppVersion: string
-  DeviceName: string; OSName: string; OSVersion: string; HardwareID: string; LastIP: string
+  DeviceName: string; OSName: string; OSVersion: string; HardwareID: string; HardwareSerial: string; LastIP: string
   LastSeenAt: string; Online: boolean
 }
 type Detail = {
@@ -91,6 +91,11 @@ export default function UserDetail() {
                   <Typography variant="caption" color="text.secondary" component="div">
                     IP <Mono>{dv.LastIP || '–'}</Mono> · ID <Mono>{short(dv.DeviceID, 8)}</Mono>{dv.HardwareID ? <> · HW <Mono>{short(dv.HardwareID, 10)}</Mono></> : null}
                   </Typography>
+                  {dv.HardwareSerial && (
+                    <Typography variant="caption" color="text.secondary" component="div">
+                      Serial <Mono>{dv.HardwareSerial}</Mono>
+                    </Typography>
+                  )}
                 </Box>
               ))}
             </CardContent>
