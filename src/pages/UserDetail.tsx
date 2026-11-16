@@ -6,13 +6,19 @@ import {
 } from '@mui/material'
 import { get, post } from '../api'
 import { useAuth } from '../auth'
-import { EmptyRow, ErrorBox, Loading, Mono, NoteDialog, PageHeader, StatusChip, short, useAction, useLoad, when } from '../components/common'
+import { ago, EmptyRow, ErrorBox, Loading, Mono, NoteDialog, PageHeader, StatusChip, short, useAction, useLoad, when } from '../components/common'
 
 type Entitlement = { id: number; plan_id: string; source: string; starts_at: string; expires_at: string; revoked_at?: string; note?: string }
+type Device = {
+  ID: number; DeviceID: string; Platform: string; AppVersion: string
+  DeviceName: string; OSName: string; OSVersion: string; HardwareID: string; LastIP: string
+  LastSeenAt: string; Online: boolean
+}
 type Detail = {
   user: { id: number; email: string; tier: string; premium_until?: string; created_at: string; last_login_at?: string }
   disabled: boolean
-  devices: { ID: number; DeviceID: string; Platform: string; AppVersion: string; LastSeenAt: string }[]
+  online: boolean
+  devices: Device[]
   entitlements: Entitlement[]
   invoices: { id: string; status: string; plan: { name: string }; amount: string; method: { asset: string; network: string }; amount_usd: string; created_at: string; tx_hash?: string; tx_url?: string }[]
   favourites: { kind: string; ref_id: string; name: string }[]
@@ -68,12 +74,24 @@ export default function UserDetail() {
         <Grid item xs={12} md={4}>
           <Card sx={{ height: '100%' }}>
             <CardContent>
-              <Typography variant="body2" color="text.secondary">Devices</Typography>
-              {d.devices.length === 0 && <Typography color="text.secondary">None linked.</Typography>}
+              <Stack direction="row" spacing={1} alignItems="center" justifyContent="space-between">
+                <Typography variant="body2" color="text.secondary">Devices</Typography>
+                <Chip size="small" color={d.online ? 'success' : 'default'} label={d.online ? 'online' : 'offline'} />
+              </Stack>
+              {d.devices.length === 0 && <Typography color="text.secondary" sx={{ mt: 1 }}>None linked.</Typography>}
               {d.devices.map((dv) => (
-                <Typography key={dv.ID} variant="body2" sx={{ mt: 0.5 }}>
-                  <Mono>{short(dv.DeviceID, 8)}</Mono> · {dv.Platform || 'android'} {dv.AppVersion} · {when(dv.LastSeenAt)}
-                </Typography>
+                <Box key={dv.ID} sx={{ mt: 1.5 }}>
+                  <Stack direction="row" spacing={1} alignItems="center">
+                    <Box sx={{ width: 8, height: 8, borderRadius: '50%', flexShrink: 0, bgcolor: dv.Online ? 'success.main' : 'grey.400' }} />
+                    <Typography variant="body2" sx={{ fontWeight: 600 }}>{dv.DeviceName || short(dv.DeviceID, 8)}</Typography>
+                  </Stack>
+                  <Typography variant="caption" color="text.secondary" component="div">
+                    {dv.Platform || 'android'}{dv.OSVersion ? ` ${dv.OSVersion}` : ''}{dv.AppVersion ? ` · v${dv.AppVersion}` : ''} · {dv.Online ? 'online now' : `seen ${ago(dv.LastSeenAt)}`}
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary" component="div">
+                    IP <Mono>{dv.LastIP || '–'}</Mono> · ID <Mono>{short(dv.DeviceID, 8)}</Mono>{dv.HardwareID ? <> · HW <Mono>{short(dv.HardwareID, 10)}</Mono></> : null}
+                  </Typography>
+                </Box>
               ))}
             </CardContent>
           </Card>

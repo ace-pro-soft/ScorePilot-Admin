@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
-  Chip, InputAdornment, MenuItem, Paper, Stack, Table, TableBody, TableCell, TableContainer, TableHead,
+  Box, Chip, InputAdornment, MenuItem, Paper, Stack, Table, TableBody, TableCell, TableContainer, TableHead,
   TablePagination, TableRow, TextField,
 } from '@mui/material'
 import SearchIcon from '@mui/icons-material/Search'
@@ -10,7 +10,7 @@ import { EmptyRow, ErrorBox, Loading, PageHeader, useLoad, when } from '../compo
 
 type UserRow = {
   id: number; email: string; tier: string; premium_until?: string; created_at: string; last_login_at?: string
-  devices: number; favourites: number; paid_invoices: number
+  devices: number; favourites: number; paid_invoices: number; online: boolean
 }
 
 export default function Users() {
@@ -54,7 +54,12 @@ export default function Users() {
                 {data?.users.length === 0 && <EmptyRow cols={8} text="No users match." />}
                 {data?.users.map((u) => (
                   <TableRow key={u.id} hover sx={{ cursor: 'pointer' }} onClick={() => nav(`/users/${u.id}`)}>
-                    <TableCell>{u.email}</TableCell>
+                    <TableCell>
+                      <Stack direction="row" spacing={1} alignItems="center">
+                        <Box sx={{ width: 8, height: 8, borderRadius: '50%', flexShrink: 0, bgcolor: u.online ? 'success.main' : 'grey.400' }} title={u.online ? 'online' : 'offline'} />
+                        <span>{u.email}</span>
+                      </Stack>
+                    </TableCell>
                     <TableCell><Chip size="small" label={u.tier} color={u.tier === 'premium' ? 'success' : 'default'} /></TableCell>
                     <TableCell>{when(u.premium_until)}</TableCell>
                     <TableCell align="right">{u.paid_invoices}</TableCell>
