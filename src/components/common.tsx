@@ -141,6 +141,20 @@ export function StatusChip({ status }: { status?: string }) {
   return <Chip size="small" label={status ?? '–'} color={statusTone[status ?? ''] ?? 'default'} variant={statusTone[status ?? ''] ? 'filled' : 'outlined'} />
 }
 
+/** Account membership from the API: trial | premium | trial_ended | expired | free. */
+const membershipLook: Record<string, { label: string; color: 'success' | 'info' | 'warning' | 'default' }> = {
+  premium: { label: 'premium', color: 'success' },
+  trial: { label: 'free trial', color: 'info' },
+  trial_ended: { label: 'trial ended', color: 'warning' },
+  expired: { label: 'expired', color: 'default' },
+  free: { label: 'free', color: 'default' },
+}
+
+export function MembershipChip({ status, size = 'small' }: { status?: string; size?: 'small' | 'medium' }) {
+  const look = membershipLook[status ?? ''] ?? { label: status ?? '–', color: 'default' as const }
+  return <Chip size={size} label={look.label} color={look.color} variant={look.color === 'default' ? 'outlined' : 'filled'} />
+}
+
 // ---- dialogs ----
 
 /** Asks for a note (required by the API for money decisions) before running an action. */

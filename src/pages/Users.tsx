@@ -1,16 +1,17 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
-  Box, Chip, InputAdornment, MenuItem, Paper, Stack, Table, TableBody, TableCell, TableContainer, TableHead,
+  Box, InputAdornment, MenuItem, Paper, Stack, Table, TableBody, TableCell, TableContainer, TableHead,
   TablePagination, TableRow, TextField,
 } from '@mui/material'
 import SearchIcon from '@mui/icons-material/Search'
 import { get } from '../api'
-import { EmptyRow, ErrorBox, Loading, PageHeader, useLoad, when } from '../components/common'
+import { EmptyRow, ErrorBox, Loading, MembershipChip, PageHeader, useLoad, when } from '../components/common'
 
 type UserRow = {
   id: number; email: string; tier: string; premium_until?: string; created_at: string; last_login_at?: string
   devices: number; favourites: number; paid_invoices: number; online: boolean
+  membership: string; trial_ends_at?: string
 }
 
 export default function Users() {
@@ -33,7 +34,9 @@ export default function Users() {
           InputProps={{ startAdornment: <InputAdornment position="start"><SearchIcon /></InputAdornment> }} sx={{ minWidth: 280 }} />
         <TextField size="small" select label="Tier" value={tier} onChange={(e) => { setPage(0); setTier(e.target.value) }} sx={{ minWidth: 160 }}>
           <MenuItem value="">All</MenuItem>
-          <MenuItem value="premium">Premium</MenuItem>
+          <MenuItem value="premium">Premium (paid or trial)</MenuItem>
+          <MenuItem value="trial">On free trial</MenuItem>
+          <MenuItem value="trial_ended">Trial ended, not paid</MenuItem>
           <MenuItem value="free">Free</MenuItem>
           <MenuItem value="disabled">Disabled</MenuItem>
         </TextField>
@@ -45,7 +48,7 @@ export default function Users() {
             <Table size="small">
               <TableHead>
                 <TableRow>
-                  <TableCell>Email</TableCell><TableCell>Tier</TableCell><TableCell>Premium until</TableCell>
+                  <TableCell>Email</TableCell><TableCell>Membership</TableCell><TableCell>Premium until</TableCell>
                   <TableCell align="right">Payments</TableCell><TableCell align="right">Devices</TableCell>
                   <TableCell align="right">Follows</TableCell><TableCell>Joined</TableCell><TableCell>Last sign-in</TableCell>
                 </TableRow>
@@ -60,7 +63,7 @@ export default function Users() {
                         <span>{u.email}</span>
                       </Stack>
                     </TableCell>
-                    <TableCell><Chip size="small" label={u.tier} color={u.tier === 'premium' ? 'success' : 'default'} /></TableCell>
+                    <TableCell><MembershipChip status={u.membership} /></TableCell>
                     <TableCell>{when(u.premium_until)}</TableCell>
                     <TableCell align="right">{u.paid_invoices}</TableCell>
                     <TableCell align="right">{u.devices}</TableCell>

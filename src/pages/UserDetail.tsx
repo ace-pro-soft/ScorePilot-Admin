@@ -6,7 +6,7 @@ import {
 } from '@mui/material'
 import { get, post } from '../api'
 import { useAuth } from '../auth'
-import { ago, EmptyRow, ErrorBox, Loading, Mono, NoteDialog, PageHeader, StatusChip, short, useAction, useLoad, when } from '../components/common'
+import { ago, EmptyRow, ErrorBox, Loading, MembershipChip, Mono, NoteDialog, PageHeader, StatusChip, short, useAction, useLoad, when } from '../components/common'
 
 type Entitlement = { id: number; plan_id: string; source: string; starts_at: string; expires_at: string; revoked_at?: string; note?: string }
 type Device = {
@@ -26,6 +26,10 @@ type Detail = {
   chat: {
     profile_complete: boolean; name: string; username: string; bio: string; phone: string; phone_verified: boolean
     chat_banned: boolean; last_seen_at?: string; messages: number; reports_against: number; conversations: number
+  }
+  membership: {
+    status: string; days_left: number
+    trial: { used: boolean; active: boolean; starts_at?: string; ends_at?: string; days_left: number }
   }
 }
 
@@ -64,10 +68,18 @@ export default function UserDetail() {
             <CardContent>
               <Typography variant="body2" color="text.secondary">Plan</Typography>
               <Stack direction="row" spacing={1} alignItems="center" sx={{ my: 1 }}>
-                <Chip label={d.user.tier} color={d.user.tier === 'premium' ? 'success' : 'default'} />
+                <MembershipChip status={d.membership?.status ?? d.user.tier} size="medium" />
                 {d.disabled && <Chip label="disabled" color="error" />}
               </Stack>
-              <Typography>Premium until: <b>{when(d.user.premium_until)}</b></Typography>
+              <Typography>Premium until: <b>{when(d.user.premium_until)}</b>{d.membership?.days_left ? ` (${d.membership.days_left} days left)` : ''}</Typography>
+              {d.membership?.trial.used ? (
+                <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+                  Free trial {when(d.membership.trial.starts_at)} – {when(d.membership.trial.ends_at)}
+                  {d.membership.trial.active ? ` · ${d.membership.trial.days_left} days left` : ' · finished'}
+                </Typography>
+              ) : (
+                <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>No free trial.</Typography>
+              )}
             </CardContent>
           </Card>
         </Grid>

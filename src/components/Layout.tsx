@@ -61,7 +61,7 @@ function Brand() {
     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
       <img src={`${import.meta.env.BASE_URL}emblem.png`} alt="" width={30} height={30} />
       <Typography variant="h6" sx={{ fontWeight: 800, color: '#fff' }}>
-        Score<Box component="span" sx={{ color: brand.mint }}>Pilot</Box>
+        XWill<Box component="span" sx={{ color: brand.mint }}>Win</Box>
       </Typography>
       <Chip label="Admin" size="small" sx={{ bgcolor: 'rgba(64,249,187,0.15)', color: brand.mint, height: 22 }} />
     </Box>

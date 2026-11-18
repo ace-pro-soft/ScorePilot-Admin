@@ -192,7 +192,7 @@ function UploadDialog({ open, onClose, onDone }: { open: boolean; onClose: () =>
       <DialogContent>
         <Typography color="text.secondary" sx={{ mb: 2 }}>
           A signed release APK, or a desktop installer exactly as the build names it (for example
-          {' '}<Mono>ScorePilot-1.2.3-win-x64-setup.exe</Mono>). The version must be higher than every earlier release for
+          {' '}<Mono>XWillWin-1.2.3-win-x64.zip</Mono>). The version must be higher than every earlier release for
           that platform. The server reads the platform and version from the file.
         </Typography>
         <Stack spacing={2}>

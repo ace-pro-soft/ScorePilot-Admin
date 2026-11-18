@@ -38,7 +38,7 @@ export default function Login() {
           <Stack alignItems="center" spacing={1} sx={{ mb: 3 }}>
             <img src={`${import.meta.env.BASE_URL}emblem.png`} alt="" width={56} height={56} />
             <Typography variant="h5">
-              Score<Box component="span" sx={{ color: 'primary.main' }}>Pilot</Box> Admin
+              XWill<Box component="span" sx={{ color: 'primary.main' }}>Win</Box> Admin
             </Typography>
             <Typography variant="body2" color="text.secondary">Sign in to manage the service</Typography>
           </Stack>

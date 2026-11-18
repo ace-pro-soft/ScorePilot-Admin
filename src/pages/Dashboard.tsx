@@ -9,6 +9,7 @@ import { brand } from '../theme'
 
 type Dash = {
   users: { total: number; new_7d: number; premium_active: number; new_devices_7d: number }
+  trials?: { days: number; total: number; active: number; converted: number }
   revenue: { usd_30d: string; paid_30d: number; usd_total: string; paid_total: number; daily: { day: string; cents: number; n: number }[]; by_method: { method_id: string; n: number; cents: number }[] }
   invoices_30d: Record<string, number>
   queues: { review: number; unmatched_transfers: number }
@@ -56,10 +57,16 @@ export default function Dashboard() {
         </Alert>
       )}
       <Grid container spacing={2} sx={{ mb: 2 }}>
-        <Grid item xs={6} md={3}><Kpi label="Accounts" value={d.users.total} sub={`+${d.users.new_7d} in 7 days`} /></Grid>
-        <Grid item xs={6} md={3}><Kpi label="Premium now" value={d.users.premium_active} sub={`${d.users.total ? Math.round((d.users.premium_active / d.users.total) * 100) : 0}% of accounts`} tone="good" /></Grid>
-        <Grid item xs={6} md={3}><Kpi label="Revenue, 30 days" value={`$${d.revenue.usd_30d}`} sub={`${d.revenue.paid_30d} payments`} /></Grid>
-        <Grid item xs={6} md={3}><Kpi label="Revenue, all time" value={`$${d.revenue.usd_total}`} sub={`${d.revenue.paid_total} payments`} /></Grid>
+        <Grid item xs={6} md={4} lg><Kpi label="Accounts" value={d.users.total} sub={`+${d.users.new_7d} in 7 days`} /></Grid>
+        <Grid item xs={6} md={4} lg><Kpi label="Premium now" value={d.users.premium_active} sub={`${d.users.total ? Math.round((d.users.premium_active / d.users.total) * 100) : 0}% of accounts, trials included`} tone="good" /></Grid>
+        {d.trials && (
+          <Grid item xs={6} md={4} lg>
+            <Kpi label={d.trials.days ? `On ${d.trials.days}-day free trial` : 'Free trial (off)'} value={d.trials.active}
+              sub={`${d.trials.converted} of ${d.trials.total} trials paid${d.trials.total ? ` (${Math.round((d.trials.converted / d.trials.total) * 100)}%)` : ''}`} />
+          </Grid>
+        )}
+        <Grid item xs={6} md={6} lg><Kpi label="Revenue, 30 days" value={`$${d.revenue.usd_30d}`} sub={`${d.revenue.paid_30d} payments`} /></Grid>
+        <Grid item xs={12} md={6} lg><Kpi label="Revenue, all time" value={`$${d.revenue.usd_total}`} sub={`${d.revenue.paid_total} payments`} /></Grid>
       </Grid>
       <Grid container spacing={2} sx={{ mb: 2 }}>
         <Grid item xs={12} md={8}>

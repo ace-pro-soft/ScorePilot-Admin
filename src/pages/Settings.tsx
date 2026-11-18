@@ -14,6 +14,7 @@ type Knobs = {
   min_app_version: string
   banner: string
   checkout_enabled: boolean
+  trial_days: number
 }
 
 export default function Settings() {
@@ -47,6 +48,12 @@ export default function Settings() {
                 </TextField>
                 <TextField type="number" label="Teams a guest can follow" value={k.guest_favourite_limit} disabled={!writable}
                   onChange={(e) => set('guest_favourite_limit', Number(e.target.value))} helperText="Signed-in accounts can follow any number." />
+                <TextField type="number" label="Free trial for new accounts (days)" value={k.trial_days ?? 0} disabled={!writable}
+                  inputProps={{ min: 0, max: 90 }}
+                  onChange={(e) => set('trial_days', Math.max(0, Math.min(90, Math.round(Number(e.target.value) || 0))))}
+                  helperText={k.trial_days > 0
+                    ? `A new account gets Premium for ${k.trial_days} days, then Premium features lock until it pays. One trial per device. Applies to sign-ups from now on.`
+                    : 'Off: new accounts start on the free tier.'} />
               </Stack>
             </CardContent>
           </Card>
