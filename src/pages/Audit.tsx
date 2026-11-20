@@ -30,7 +30,7 @@ export default function Audit() {
 
   return (
     <>
-      <PageHeader title="Audit log" subtitle="Every admin write, newest first." />
+      <PageHeader title="Audit log" />
       <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} sx={{ mb: 2 }}>
         <TextField size="small" select label="Entity" value={entity} onChange={(e) => { setEntity(e.target.value); setPage(0) }} sx={{ minWidth: 180 }}>
           {entities.map((e) => <MenuItem key={e} value={e}>{e || 'All'}</MenuItem>)}

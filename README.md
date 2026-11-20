@@ -4,9 +4,15 @@ The web panel for running ScorePilot. It talks only to the backend's `/admin/api
 have their own accounts and roles, and every change is written to an audit log. The panel
 never calls the BestPreviews API itself.
 
-Stack: React 18, TypeScript, Vite, Material UI, styled with the ScorePilot brand colours.
+Stack: React 18, TypeScript, Vite, Material UI, in the xwillwin.com style (`src/theme.ts`): a
+dark navy theme with gold for actions, cyan for navigation and information, and green, red and
+orange only for good, bad and waiting states. The font is Archivo, condensed for titles and
+numbers. The logo and icons in `public/` are copies from the landing repo's `brand/` folder.
 
 ## What it does
+
+The pages show data and controls only; what each page and action does is explained in
+[docs/admin-guide.md](docs/admin-guide.md).
 
 | Page | For |
 |---|---|
@@ -17,7 +23,9 @@ Stack: React 18, TypeScript, Vite, Material UI, styled with the ScorePilot brand
 | Plans & methods | Plan names, lengths and USD prices; switch each token/network on or off; confirmation counts; which receiving addresses are configured |
 | Picks | Today's model picks; pin the Pick of the Day |
 | Leagues | Rename, set tier, hide or reorder leagues |
-| App settings | When free users see picks, the guest follow limit, the Pick of the Day odds band, the minimum app version, an in-app banner, and a switch that pauses checkout |
+| Community | Reported messages, official communities, community admins, posting bans |
+| App settings | When free users see picks, the guest follow limit, the free trial length, the Pick of the Day odds band, the minimum app version, an in-app banner, and a switch that pauses checkout |
+| App releases | Upload Android and desktop releases; choose who is offered each update (everyone, chosen users, devices by install date); set the base release the website hands out |
 | Sync & cache | Run any sync job now, see cache usage, purge by key prefix, check the chain watchers |
 | Admins | Add admins, change roles, disable access (owners only) |
 | Audit log | Who changed what, with before/after details |
@@ -28,7 +36,7 @@ Roles:
 | Role | Can do |
 |---|---|
 | owner | Everything |
-| ops | Sync and cache, settings, leagues, picks, plans and methods |
+| ops | Sync and cache, settings, leagues, picks, plans and methods, app releases |
 | support | Users, Premium grants, payments and transfers |
 | editor | Leagues, Pick of the Day, app settings |
 | viewer | Read only |

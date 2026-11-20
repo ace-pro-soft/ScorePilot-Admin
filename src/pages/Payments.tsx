@@ -40,7 +40,7 @@ export default function Payments() {
 
   return (
     <>
-      <PageHeader title="Payments" subtitle="Crypto invoices. Payments in review need a decision: credit or reject." />
+      <PageHeader title="Payments" />
       <Stack direction={{ xs: 'column', md: 'row' }} spacing={2} sx={{ mb: 2 }}>
         <TextField size="small" placeholder="Email, transaction hash or invoice id" value={q} onChange={(e) => setQ(e.target.value)}
           onKeyDown={(e) => { if (e.key === 'Enter') set('q', q.trim()) }} sx={{ minWidth: 320 }}
@@ -118,7 +118,7 @@ function InvoiceDrawer({ id, onClose, onChanged }: { id: string | null; onClose:
         <>
           {inv.status === 'review' && (
             <Alert severity="warning" sx={{ my: 2 }}>
-              The payer claimed a transaction that does not match the invoice exactly. Check it on the explorer, then credit or reject.
+              The claimed transaction does not match the invoice exactly.
             </Alert>
           )}
           <Row label="Status"><StatusChip status={inv.status} /></Row>
@@ -156,7 +156,7 @@ function InvoiceDrawer({ id, onClose, onChanged }: { id: string | null; onClose:
       <NoteDialog
         open={dialog === 'credit'}
         title="Credit this invoice"
-        text={`Marks it paid and grants ${inv?.plan?.name ?? 'the plan'} to ${inv?.user_email}. Only do this after checking the transfer on the explorer.`}
+        text={`Grant ${inv?.plan?.name ?? 'the plan'} to ${inv?.user_email}?`}
         confirm="Credit"
         onClose={() => setDialog(null)}
         onConfirm={async (note) => {
@@ -168,7 +168,7 @@ function InvoiceDrawer({ id, onClose, onChanged }: { id: string | null; onClose:
       <NoteDialog
         open={dialog === 'reject'}
         title="Reject this invoice"
-        text="Closes the invoice without granting Premium. If money arrived, refund it from the wallet and say so in the note."
+        text="Close the invoice without granting Premium?"
         confirm="Reject"
         danger
         onClose={() => setDialog(null)}

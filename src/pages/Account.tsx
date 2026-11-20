@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import QRCode from 'qrcode'
-import { Alert, Box, Button, Card, CardContent, Chip, Grid, Stack, TextField, Typography } from '@mui/material'
+import { Box, Button, Card, CardContent, Chip, Grid, Stack, TextField, Typography } from '@mui/material'
 import { post } from '../api'
 import { useAuth } from '../auth'
 import { Mono, PageHeader, useAction } from '../components/common'
@@ -47,7 +47,6 @@ export default function Account() {
               </Stack>
               {admin?.totp_enabled ? (
                 <Stack spacing={2}>
-                  <Typography color="text.secondary">Sign-in asks for a code from your authenticator app.</Typography>
                   <TextField type="password" label="Password to turn it off" value={disablePw} onChange={(e) => setDisablePw(e.target.value)} />
                   <Button color="error" variant="outlined" disabled={busy || !disablePw}
                     onClick={() => run(() => post('/me/totp/disable', { password: disablePw }), 'Two-factor turned off').then((ok) => { if (ok) { setDisablePw(''); refresh() } })}>
@@ -56,17 +55,15 @@ export default function Account() {
                 </Stack>
               ) : !setup ? (
                 <Stack spacing={2}>
-                  <Alert severity="warning">Turn this on: admin accounts can credit payments and grant Premium.</Alert>
                   <Button variant="contained" disabled={busy} onClick={async () => { try { setSetup(await post('/me/totp/setup')) } catch { /* toast via useAction not needed */ } }}>
                     Set up with an authenticator app
                   </Button>
                 </Stack>
               ) : (
                 <Stack spacing={2}>
-                  <Typography color="text.secondary">Scan the code with Google Authenticator, 1Password, Authy or similar, then enter the 6-digit code.</Typography>
                   {qr && <Box component="img" src={qr} alt="Authenticator QR code" sx={{ width: 220, height: 220, alignSelf: 'center' }} />}
-                  <Typography variant="body2">Or enter this key: <Mono>{setup.secret}</Mono></Typography>
-                  <TextField label="Code" value={code} onChange={(e) => setCode(e.target.value.replace(/\D/g, '').slice(0, 6))} inputProps={{ inputMode: 'numeric' }} />
+                  <Typography variant="body2">Key: <Mono>{setup.secret}</Mono></Typography>
+                  <TextField label="6-digit code" value={code} onChange={(e) => setCode(e.target.value.replace(/\D/g, '').slice(0, 6))} inputProps={{ inputMode: 'numeric' }} />
                   <Button variant="contained" disabled={busy || code.length !== 6}
                     onClick={() => run(() => post('/me/totp/enable', { code }), 'Two-factor is on').then((ok) => { if (ok) { setSetup(null); setCode(''); refresh() } })}>
                     Turn on

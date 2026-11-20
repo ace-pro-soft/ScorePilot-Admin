@@ -75,7 +75,7 @@ export function PageHeader({ title, subtitle, actions }: { title: string; subtit
   return (
     <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} justifyContent="space-between" alignItems={{ sm: 'flex-end' }} sx={{ mb: 3 }}>
       <Box>
-        <Typography variant="h4">{title}</Typography>
+        <Typography variant="h4" component="h1" sx={{ textTransform: 'uppercase', letterSpacing: '0.01em', fontSize: { xs: '2rem', md: '2.4rem' } }}>{title}</Typography>
         {subtitle && <Typography color="text.secondary">{subtitle}</Typography>}
       </Box>
       {actions && <Stack direction="row" spacing={1}>{actions}</Stack>}
@@ -92,7 +92,7 @@ export function ErrorBox({ error, onRetry }: { error: string; onRetry?: () => vo
 }
 
 export function Kpi({ label, value, sub, tone }: { label: string; value: ReactNode; sub?: ReactNode; tone?: 'good' | 'warn' | 'bad' }) {
-  const color = tone === 'good' ? 'success.main' : tone === 'warn' ? 'warning.main' : tone === 'bad' ? 'error.main' : 'primary.main'
+  const color = tone === 'good' ? 'success.main' : tone === 'warn' ? 'warning.main' : tone === 'bad' ? 'error.main' : 'text.primary'
   return (
     <Card sx={{ height: '100%' }}>
       <CardContent>

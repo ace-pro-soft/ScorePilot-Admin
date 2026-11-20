@@ -82,7 +82,7 @@ export default function Catalogue() {
 
   return (
     <>
-      <PageHeader title="Plans & payment methods" subtitle="Prices are in USD and converted at checkout. Open invoices keep the price they were created with." />
+      <PageHeader title="Plans & payment methods" />
       {plans.error && <ErrorBox error={plans.error} onRetry={plans.reload} />}
       <Typography variant="h6" sx={{ mb: 1 }}>Plans</Typography>
       <Paper sx={{ mb: 3 }}>
@@ -100,7 +100,7 @@ export default function Catalogue() {
       </Grid>
       {missing > 0 && (
         <Alert severity="info" sx={{ mb: 2 }}>
-          {missing} method(s) have no receiving address. Set PAY_ADDRESS_EVM, PAY_ADDRESS_TRON, PAY_ADDRESS_SOLANA or PAY_ADDRESS_BITCOIN on the server to offer them.
+          {missing} method(s) have no receiving address.
         </Alert>
       )}
       {methods.error && <ErrorBox error={methods.error} onRetry={methods.reload} />}

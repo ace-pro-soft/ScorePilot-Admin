@@ -28,7 +28,7 @@ export default function Operations() {
 
   return (
     <>
-      <PageHeader title="Sync & cache" subtitle="Upstream polling jobs, the in-process cache and the chain watchers." actions={<Button onClick={reload}>Refresh</Button>} />
+      <PageHeader title="Sync & cache" actions={<Button onClick={reload}>Refresh</Button>} />
       <Grid container spacing={2}>
         <Grid item xs={12} lg={7}>
           <Card>
@@ -72,7 +72,7 @@ export default function Operations() {
               {ops && (
                 <Stack direction="row" spacing={1}>
                   <TextField size="small" label="Key prefix" placeholder="detail:19872608" value={prefix} onChange={(e) => setPrefix(e.target.value)} sx={{ flex: 1 }}
-                    helperText="Empty purges everything; data is fetched again on demand." />
+                    helperText="Empty: everything" />
                   <Button color="warning" variant="outlined" disabled={busy}
                     onClick={() => run(() => post('/cache/purge', { prefix }), prefix ? `Purged ${prefix}*` : 'Cache cleared').then(() => reload())}>Purge</Button>
                 </Stack>

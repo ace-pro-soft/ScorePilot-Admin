@@ -22,9 +22,9 @@ export default function Picks() {
 
   return (
     <>
-      <PageHeader title="Picks" subtitle={`Model picks for ${d.date} (UTC). ${d.upcoming} more are published for the next three days.`} />
+      <PageHeader title="Picks" subtitle={`${d.date} (UTC) · ${d.upcoming} upcoming`} />
       <Alert severity={pod ? 'success' : 'info'} sx={{ mb: 2 }} icon={<StarIcon />}>
-        {pod ? <>Pick of the Day: <b>{pod.title}</b> ({pod.league}), {pod.selection} at {pod.market_odds.toFixed(2)}.</> : 'No Pick of the Day pinned yet; the backend chooses one on the first request of the day.'}
+        {pod ? <>Pick of the Day: <b>{pod.title}</b> ({pod.league}), {pod.selection} at {pod.market_odds.toFixed(2)}.</> : 'No Pick of the Day pinned yet.'}
       </Alert>
       <Paper>
         <TableContainer>

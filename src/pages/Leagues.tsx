@@ -18,7 +18,7 @@ function LeagueRow({ l, writable, onSaved }: { l: League; writable: boolean; onS
   const save = (body: Record<string, unknown>, msg: string) => run(() => patch(`/leagues/${l.id}`, body), msg).then((ok) => ok && onSaved())
   return (
     <TableRow sx={{ opacity: l.visible ? 1 : 0.55 }}>
-      <TableCell><Avatar src={l.logo} variant="rounded" sx={{ width: 28, height: 28, bgcolor: '#F3F4F6' }}>{l.name?.[0]}</Avatar></TableCell>
+      <TableCell><Avatar src={l.logo} variant="rounded" sx={{ width: 28, height: 28, bgcolor: '#f3f5fb', color: '#070b1a', p: '2px' }}>{l.name?.[0]}</Avatar></TableCell>
       <TableCell><Mono>{l.id}</Mono></TableCell>
       <TableCell>
         <Stack direction="row" spacing={1} alignItems="center">
@@ -52,7 +52,7 @@ export default function Leagues() {
 
   return (
     <>
-      <PageHeader title="Leagues" subtitle="Catalogue used for grouping, filters and Pick of the Day. New leagues are added automatically as fixtures arrive." />
+      <PageHeader title="Leagues" />
       <TextField size="small" placeholder="Filter" value={q} onChange={(e) => setQ(e.target.value)} sx={{ mb: 2, minWidth: 280 }}
         InputProps={{ startAdornment: <InputAdornment position="start"><SearchIcon /></InputAdornment> }} />
       {error && <ErrorBox error={error} onRetry={reload} />}

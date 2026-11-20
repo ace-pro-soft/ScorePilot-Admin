@@ -1,21 +1,13 @@
 import { useState } from 'react'
 import {
-  Alert, Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, MenuItem, Paper, Stack, Switch, Table,
-  TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography,
+  Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, MenuItem, Paper, Stack, Switch, Table,
+  TableBody, TableCell, TableContainer, TableHead, TableRow, TextField,
 } from '@mui/material'
 import { get, patch, post } from '../api'
 import { useAuth } from '../auth'
 import { ErrorBox, Loading, PageHeader, useAction, useLoad, when } from '../components/common'
 
 type AdminRow = { id: number; email: string; name: string; role: string; totp_enabled: boolean; disabled: boolean; last_login_at?: string; created_at: string }
-
-const roleHelp: Record<string, string> = {
-  owner: 'Everything, including admins and prices',
-  ops: 'Sync, cache, settings, leagues, picks, plans and methods',
-  support: 'Users, premium grants, payments and transfers',
-  editor: 'Leagues, Pick of the Day and app settings',
-  viewer: 'Read-only',
-}
 
 export default function Admins() {
   const { can, admin: me } = useAuth()
@@ -29,9 +21,8 @@ export default function Admins() {
 
   return (
     <>
-      <PageHeader title="Admins" subtitle="People who can sign in to this panel. Every write is recorded in the audit log."
+      <PageHeader title="Admins"
         actions={writable && <Button variant="contained" onClick={() => setOpen(true)}>Add admin</Button>} />
-      {!writable && <Alert severity="info" sx={{ mb: 2 }}>Only owners can add or change admins.</Alert>}
       <Paper>
         <TableContainer>
           <Table size="small">
@@ -59,21 +50,17 @@ export default function Admins() {
           </Table>
         </TableContainer>
       </Paper>
-      <Typography variant="h6" sx={{ mt: 3, mb: 1 }}>Roles</Typography>
-      <Stack spacing={0.5}>
-        {Object.entries(roleHelp).map(([r, t]) => <Typography key={r} variant="body2"><b>{r}</b>: {t}</Typography>)}
-      </Stack>
       <Dialog open={open} onClose={() => setOpen(false)} fullWidth maxWidth="sm">
         <DialogTitle>Add admin</DialogTitle>
         <DialogContent>
           <Stack spacing={2} sx={{ mt: 1 }}>
             <TextField label="Email" type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
             <TextField label="Name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
-            <TextField select label="Role" value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })} helperText={roleHelp[form.role]}>
+            <TextField select label="Role" value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })}>
               {data!.roles.map((r) => <MenuItem key={r} value={r}>{r}</MenuItem>)}
             </TextField>
             <TextField label="Initial password" type="password" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })}
-              helperText="At least 10 characters. Ask them to change it and turn on two-factor." />
+              helperText="At least 10 characters" />
           </Stack>
         </DialogContent>
         <DialogActions>

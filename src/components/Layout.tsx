@@ -2,9 +2,9 @@ import { useState, type ReactNode } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
 import {
   AppBar, Avatar, Box, Chip, Divider, Drawer, IconButton, List, ListItemButton, ListItemIcon, ListItemText,
-  ListSubheader, Menu, MenuItem, Toolbar, Typography, useMediaQuery,
+  ListSubheader, Menu, MenuItem, Toolbar, useMediaQuery,
 } from '@mui/material'
-import { useTheme } from '@mui/material/styles'
+import { alpha, useTheme } from '@mui/material/styles'
 import DashboardIcon from '@mui/icons-material/SpaceDashboardOutlined'
 import PeopleIcon from '@mui/icons-material/PeopleOutline'
 import ReceiptIcon from '@mui/icons-material/ReceiptLongOutlined'
@@ -58,12 +58,9 @@ const sections: { title: string; items: NavItem[] }[] = [
 
 function Brand() {
   return (
-    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-      <img src={`${import.meta.env.BASE_URL}emblem.png`} alt="" width={30} height={30} />
-      <Typography variant="h6" sx={{ fontWeight: 800, color: '#fff' }}>
-        XWill<Box component="span" sx={{ color: brand.mint }}>Win</Box>
-      </Typography>
-      <Chip label="Admin" size="small" sx={{ bgcolor: 'rgba(64,249,187,0.15)', color: brand.mint, height: 22 }} />
+    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25 }}>
+      <img src={`${import.meta.env.BASE_URL}xwillwin-logo-light.svg`} alt="XWillWin" width={139} height={28} style={{ display: 'block' }} />
+      <Chip label="Admin" size="small" color="primary" sx={{ height: 22, fontSize: 12 }} />
     </Box>
   )
 }
@@ -77,12 +74,12 @@ export default function Layout({ children }: { children: ReactNode }) {
   const loc = useLocation()
 
   const nav = (
-    <Box sx={{ bgcolor: brand.dark, color: '#fff', height: '100%', display: 'flex', flexDirection: 'column' }}>
+    <Box sx={{ bgcolor: brand.panel, color: brand.chalk, height: '100%', display: 'flex', flexDirection: 'column', borderRight: `1px solid ${brand.line}` }}>
       <Toolbar><Brand /></Toolbar>
-      <Divider sx={{ borderColor: 'rgba(255,255,255,0.08)' }} />
-      <Box sx={{ overflowY: 'auto', flex: 1 }}>
+      <Divider />
+      <Box sx={{ overflowY: 'auto', flex: 1, pb: 2 }}>
         {sections.map((s) => (
-          <List key={s.title} dense subheader={<ListSubheader sx={{ bgcolor: 'transparent', color: 'rgba(255,255,255,0.5)', lineHeight: '32px', mt: 1 }}>{s.title}</ListSubheader>}>
+          <List key={s.title} dense subheader={<ListSubheader sx={{ bgcolor: 'transparent', lineHeight: '32px', mt: 1 }}>{s.title}</ListSubheader>}>
             {s.items.map((it) => {
               const active = it.to === '/' ? loc.pathname === '/' : loc.pathname.startsWith(it.to)
               return (
@@ -92,12 +89,18 @@ export default function Layout({ children }: { children: ReactNode }) {
                   to={it.to}
                   onClick={() => setOpen(false)}
                   sx={{
-                    mx: 1, borderRadius: 2, color: active ? brand.dark : 'rgba(255,255,255,0.85)',
-                    bgcolor: active ? brand.mint : 'transparent',
-                    '&:hover': { bgcolor: active ? brand.mint : 'rgba(255,255,255,0.06)' },
+                    position: 'relative', mx: 1, borderRadius: 1, color: active ? brand.chalk : brand.chalk2,
+                    bgcolor: active ? alpha(brand.model, 0.12) : 'transparent',
+                    '&:hover': { bgcolor: active ? alpha(brand.model, 0.16) : 'rgba(243,245,251,0.05)', color: brand.chalk },
+                    // the site's glowing cyan bar marks where you are
+                    '&::before': active ? {
+                      content: '""', position: 'absolute', left: 0, top: 6, bottom: 6, width: 3,
+                      bgcolor: brand.model, boxShadow: `0 0 10px ${alpha(brand.model, 0.8)}`,
+                    } : undefined,
+                    '& .MuiListItemIcon-root': { color: active ? brand.model : 'inherit' },
                   }}
                 >
-                  <ListItemIcon sx={{ minWidth: 36, color: 'inherit' }}>{it.icon}</ListItemIcon>
+                  <ListItemIcon sx={{ minWidth: 36 }}>{it.icon}</ListItemIcon>
                   <ListItemText primary={it.label} primaryTypographyProps={{ fontWeight: active ? 700 : 500 }} />
                 </ListItemButton>
               )
@@ -110,13 +113,16 @@ export default function Layout({ children }: { children: ReactNode }) {
 
   return (
     <Box sx={{ display: 'flex', minHeight: '100vh' }}>
-      <AppBar position="fixed" color="inherit" sx={{ bgcolor: '#fff', borderBottom: '1px solid #E5E7EB', width: { md: `calc(100% - ${WIDTH}px)` }, ml: { md: `${WIDTH}px` } }}>
+      <AppBar position="fixed" color="inherit" sx={{
+        bgcolor: alpha(brand.ink, 0.88), backdropFilter: 'blur(12px) saturate(140%)', boxShadow: `0 1px 0 ${brand.line}`,
+        width: { md: `calc(100% - ${WIDTH}px)` }, ml: { md: `${WIDTH}px` },
+      }}>
         <Toolbar>
           {!wide && <IconButton edge="start" onClick={() => setOpen(true)} sx={{ mr: 1 }}><MenuIcon /></IconButton>}
           <Box sx={{ flex: 1 }} />
           <Chip label={admin?.role} size="small" color="primary" variant="outlined" sx={{ mr: 1 }} />
           <IconButton onClick={(e) => setMenu(e.currentTarget)}>
-            <Avatar sx={{ width: 32, height: 32, bgcolor: brand.emerald }}>{(admin?.name || admin?.email || '?')[0].toUpperCase()}</Avatar>
+            <Avatar sx={{ width: 32, height: 32, bgcolor: brand.violet, color: brand.ink, fontWeight: 800 }}>{(admin?.name || admin?.email || '?')[0].toUpperCase()}</Avatar>
           </IconButton>
           <Menu anchorEl={menu} open={!!menu} onClose={() => setMenu(null)}>
             <MenuItem disabled>{admin?.email}</MenuItem>

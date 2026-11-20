@@ -31,7 +31,8 @@ function RevenueChart({ daily }: { daily: Dash['revenue']['daily'] }) {
     <Box sx={{ display: 'flex', alignItems: 'flex-end', gap: '3px', height: 120 }}>
       {days.map((d) => (
         <Box key={d.day} title={`${d.day}: $${(d.cents / 100).toFixed(2)}`}
-          sx={{ flex: 1, height: `${Math.max(2, (d.cents / max) * 100)}%`, bgcolor: d.cents ? brand.emerald : '#E5E7EB', borderRadius: '3px 3px 0 0' }} />
+          sx={{ flex: 1, height: `${Math.max(2, (d.cents / max) * 100)}%`, bgcolor: d.cents ? brand.model : 'rgba(243,245,251,0.08)', borderRadius: '2px 2px 0 0',
+            boxShadow: d.cents ? '0 0 10px rgba(53,208,255,0.35)' : 'none' }} />
       ))}
     </Box>
   )
@@ -47,9 +48,9 @@ export default function Dashboard() {
 
   return (
     <>
-      <PageHeader title="Dashboard" subtitle="Accounts, Premium, crypto revenue and system health."
+      <PageHeader title="Dashboard"
         actions={<Button startIcon={<RefreshIcon />} onClick={reload}>Refresh</Button>} />
-      {!d.settings.checkout_enabled && <Alert severity="warning" sx={{ mb: 2 }}>Checkout is paused in App settings. Users cannot start new payments.</Alert>}
+      {!d.settings.checkout_enabled && <Alert severity="warning" sx={{ mb: 2 }}>Checkout is paused.</Alert>}
       {d.settings.banner && <Alert severity="info" sx={{ mb: 2 }}>In-app banner: “{d.settings.banner}”</Alert>}
       {(d.queues.review > 0 || d.queues.unmatched_transfers > 0) && (
         <Alert severity="warning" sx={{ mb: 2 }} action={<Button color="inherit" component={RouterLink} to="/payments?status=review">Review</Button>}>
@@ -136,9 +137,7 @@ export default function Dashboard() {
                     </TableRow>
                   ))}
                 </TableBody>
-              </Table>
-              <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>Chains are read only while invoices are open.</Typography>
-            </CardContent>
+              </Table>            </CardContent>
           </Card>
         </Grid>
       </Grid>

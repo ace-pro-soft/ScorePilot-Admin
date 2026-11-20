@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import {
   Button, Link, MenuItem, Paper, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination,
-  TableRow, TextField, Typography,
+  TableRow, TextField,
 } from '@mui/material'
 import { get, post } from '../api'
 import { useAuth } from '../auth'
@@ -26,7 +26,7 @@ export default function Transfers() {
 
   return (
     <>
-      <PageHeader title="Transfers" subtitle="Everything the chain watchers saw arriving at your addresses. Unmatched ones did not fit any open invoice." />
+      <PageHeader title="Transfers" />
       <TextField size="small" select label="Status" value={status} onChange={(e) => { setStatus(e.target.value); setPage(0) }} sx={{ mb: 2, minWidth: 180 }}>
         {['unmatched', 'review', 'matched', 'credited', 'ignored', 'all'].map((s) => <MenuItem key={s} value={s}>{s}</MenuItem>)}
       </TextField>
@@ -67,12 +67,11 @@ export default function Transfers() {
       <NoteDialog
         open={!!assign}
         title="Assign transfer to an invoice"
-        text={assign ? `${assign.amount} ${assign.asset} on ${assign.network}. The invoice is credited and its plan granted.` : ''}
+        text={assign ? `${assign.amount} ${assign.asset} on ${assign.network}` : ''}
         confirm="Assign and credit"
         extra={(
           <>
-            <TextField fullWidth label="Invoice id" value={invoiceId} onChange={(e) => setInvoiceId(e.target.value.trim())} sx={{ mb: 1 }} helperText="Find it under Payments (search by the user's email)." />
-            <Typography variant="caption" color="text.secondary">The invoice must use the same token and network as the transfer.</Typography>
+            <TextField fullWidth label="Invoice id" value={invoiceId} onChange={(e) => setInvoiceId(e.target.value.trim())} sx={{ mb: 1 }} />
           </>
         )}
         onClose={() => setAssign(null)}

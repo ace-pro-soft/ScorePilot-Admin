@@ -27,7 +27,7 @@ export default function Users() {
 
   return (
     <>
-      <PageHeader title="Users" subtitle="Accounts created with the email code. Guests (devices only) are not listed." />
+      <PageHeader title="Users" />
       <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} sx={{ mb: 2 }}>
         <TextField size="small" placeholder="Search email" value={q} onChange={(e) => setQ(e.target.value)}
           onKeyDown={(e) => { if (e.key === 'Enter') { setPage(0); setSearch(q.trim()) } }}

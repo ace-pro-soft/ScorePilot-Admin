@@ -121,8 +121,8 @@ function Reports({ writable, onChanged }: { writable: boolean; onChanged: () => 
         <DialogContent>
           <Typography color="text.secondary">
             {confirm?.action === 'ban'
-              ? `The message disappears for everyone and ${confirm?.r.message.sender?.name ?? 'the sender'} can no longer post (they can still read). You can lift the ban on their user page.`
-              : 'The message disappears for everyone. The sender is not banned.'}
+              ? `Delete the message and ban ${confirm?.r.message.sender?.name ?? 'the sender'} from posting?`
+              : 'Delete the message for everyone?'}
           </Typography>
         </DialogContent>
         <DialogActions>
@@ -221,9 +221,6 @@ function AdminsDialog({ community, writable, onClose }: { community: Community; 
     <Dialog open onClose={onClose} fullWidth maxWidth="sm">
       <DialogTitle>{community.title} · admins</DialogTitle>
       <DialogContent dividers>
-        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-          Admins show an “Admin” label in the chat and can pin and delete messages in this community.
-        </Typography>
         {error && <ErrorBox error={error} onRetry={reload} />}
         {loading && !data ? <Loading /> : (
           <Table size="small">
@@ -245,8 +242,7 @@ function AdminsDialog({ community, writable, onClose }: { community: Community; 
         )}
         {writable && (
           <Stack direction="row" spacing={1} sx={{ mt: 2 }}>
-            <TextField size="small" label="Email of the person to appoint" value={email} onChange={(e) => setEmail(e.target.value)} fullWidth
-              helperText="They need a community profile. They join the community if they haven't." />
+            <TextField size="small" label="Email of the person to appoint" value={email} onChange={(e) => setEmail(e.target.value)} fullWidth />
             <Button variant="contained" disabled={busy || !email.includes('@')} onClick={() => set({ email: email.trim(), admin: true }, 'Admin appointed')} sx={{ alignSelf: 'flex-start', height: 40 }}>
               Appoint
             </Button>
@@ -319,10 +315,7 @@ export default function Community() {
   const writable = can('community.write')
   return (
     <>
-      <PageHeader
-        title="Community"
-        subtitle="Reports from the app, the official communities and posting bans. Private groups and direct chats are only visible through the messages people report."
-      />
+      <PageHeader title="Community" />
       {error && <ErrorBox error={error} onRetry={reload} />}
       {data && (
         <Grid container spacing={2} sx={{ mb: 3 }}>

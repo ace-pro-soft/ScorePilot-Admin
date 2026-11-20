@@ -12,7 +12,8 @@ type Entitlement = { id: number; plan_id: string; source: string; starts_at: str
 type Device = {
   ID: number; DeviceID: string; Platform: string; AppVersion: string
   DeviceName: string; OSName: string; OSVersion: string; HardwareID: string; HardwareSerial: string; LastIP: string
-  LastSeenAt: string; Online: boolean
+  AppVersionCode?: number; InstalledAt?: string | null; InstallVersion?: string; InstallSource?: string
+  CreatedAt: string; LastSeenAt: string; Online: boolean
 }
 type Detail = {
   user: { id: number; email: string; tier: string; premium_until?: string; created_at: string; last_login_at?: string }
@@ -99,6 +100,10 @@ export default function UserDetail() {
                   </Stack>
                   <Typography variant="caption" color="text.secondary" component="div">
                     {dv.Platform || 'android'}{dv.OSVersion ? ` ${dv.OSVersion}` : ''}{dv.AppVersion ? ` · v${dv.AppVersion}` : ''} · {dv.Online ? 'online now' : `seen ${ago(dv.LastSeenAt)}`}
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary" component="div">
+                    {dv.InstalledAt ? `Installed ${when(dv.InstalledAt)}` : `First seen ${when(dv.CreatedAt)}`}
+                    {dv.InstallVersion ? ` on v${dv.InstallVersion}` : ''}{dv.InstallSource ? ` · from ${dv.InstallSource}` : ''}
                   </Typography>
                   <Typography variant="caption" color="text.secondary" component="div">
                     IP <Mono>{dv.LastIP || '–'}</Mono> · ID <Mono>{short(dv.DeviceID, 8)}</Mono>{dv.HardwareID ? <> · HW <Mono>{short(dv.HardwareID, 10)}</Mono></> : null}
@@ -215,7 +220,6 @@ export default function UserDetail() {
       <NoteDialog
         open={grantOpen}
         title="Give Premium days"
-        text="Days are added after the current premium end date, if any."
         confirm={`Give ${days} days`}
         extra={(
           <Stack direction="row" spacing={2}>
@@ -236,7 +240,6 @@ export default function UserDetail() {
       <NoteDialog
         open={!!revoke}
         title="Revoke this premium period"
-        text="Later periods move up to fill the gap. Refunds for crypto payments are sent from the wallet by hand."
         confirm="Revoke"
         danger
         onClose={() => setRevoke(null)}
@@ -249,7 +252,6 @@ export default function UserDetail() {
       <NoteDialog
         open={disableOpen}
         title={d.disabled ? 'Enable this account' : 'Disable this account'}
-        text={d.disabled ? 'The user can sign in again.' : 'The user is signed out everywhere and cannot sign in until you enable the account again.'}
         confirm={d.disabled ? 'Enable' : 'Disable'}
         danger={!d.disabled}
         onClose={() => setDisableOpen(false)}
@@ -262,7 +264,6 @@ export default function UserDetail() {
       <NoteDialog
         open={banOpen}
         title={d.chat.chat_banned ? 'Allow posting again?' : 'Ban from posting?'}
-        text={d.chat.chat_banned ? 'They can send messages, react and create groups again.' : 'They can still sign in and read chats, but can no longer send messages, react or create groups.'}
         confirm={d.chat.chat_banned ? 'Allow posting' : 'Ban'}
         danger={!d.chat.chat_banned}
         onClose={() => setBanOpen(false)}
