@@ -1,6 +1,6 @@
-# ScorePilot Admin
+# XWillWin Admin
 
-The web panel for running ScorePilot. It talks only to the backend's `/admin/api`. Admins
+The web panel for running XWillWin. It talks only to the backend's `/admin/api`. Admins
 have their own accounts and roles, and every change is written to an audit log. The panel
 never calls the BestPreviews API itself.
 
@@ -43,23 +43,23 @@ Roles:
 
 ## Run in development
 
-You need the backend running (see `ScorePilot-Backend/README.md`) and an owner account:
+You need the backend running (see `XWillWin-Backend/README.md`) and an owner account:
 
 ```
-cd ScorePilot-Backend
+cd XWillWin-Backend
 go run ./cmd/admin create -email you@example.com -role owner        # prints a generated password
 ```
 
 Then start the panel:
 
 ```
-cd ScorePilot-Admin
+cd XWillWin-Admin
 npm install
 npm run dev            # http://localhost:5173/admin/
 ```
 
 Vite forwards `/admin/api` to `http://127.0.0.1:8080`. To use another backend, set
-`SCOREPILOT_API=http://host:8080` before `npm run dev`.
+`XWILLWIN_API=http://host:8080` before `npm run dev`.
 
 ## Build and deploy
 
@@ -67,7 +67,7 @@ Vite forwards `/admin/api` to `http://127.0.0.1:8080`. To use another backend, s
 npm run build          # type-checks, then writes dist/
 ```
 
-The backend can serve the panel itself. Set `ADMIN_UI_DIR=/path/to/ScorePilot-Admin/dist` and the
+The backend can serve the panel itself. Set `ADMIN_UI_DIR=/path/to/XWillWin-Admin/dist` and the
 panel is available at `https://<api host>/admin` on the same origin as the API, so no CORS setup
 is needed. You can also host `dist/` on any static host, as long as it forwards `/admin/api` to the
 backend.
@@ -82,5 +82,5 @@ Security notes:
   two-factor off.
 - Serve the panel only over HTTPS. Consider restricting `/admin` by IP at the reverse proxy.
 
-The screens follow `ScorePilot-Backend/docs/application-flow.md` section 4. The payment
+The screens follow `XWillWin-Backend/docs/application-flow.md` section 4. The payment
 operations are described in `docs/crypto-billing.md`.

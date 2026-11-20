@@ -9,7 +9,7 @@ export default defineConfig({
   server: {
     port: 5173,
     proxy: {
-      '/admin/api': { target: process.env.SCOREPILOT_API ?? 'http://127.0.0.1:8080', changeOrigin: true },
+      '/admin/api': { target: process.env.XWILLWIN_API ?? 'http://127.0.0.1:8080', changeOrigin: true },
     },
   },
   build: { outDir: 'dist', sourcemap: false, chunkSizeWarningLimit: 900 },

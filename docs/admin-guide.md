@@ -109,7 +109,7 @@ Roles that can't change settings see the fields disabled.
 ## App releases
 
 The files the Android app and the desktop app install and update from. Full details,
-including what the apps send: `ScorePilot-Backend/docs/app-updates.md`.
+including what the apps send: `XWillWin-Backend/docs/app-updates.md`.
 
 - **Upload**: a signed release APK, or a desktop file exactly as the build names it
   (`XWillWin-1.2.3-win-x64.zip`, `XWillWin-1.2.3-win-x64-setup.exe`, `…-linux-x64.AppImage`,
